@@ -1,9 +1,9 @@
 import express, { Application } from 'express';
 import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes';
-import db from './config/drizzle.config';
-import { UserTable } from './db/schema';
-import { errorHandler } from './libs/middleware/errorHandler';
+import db from '../libs/config/drizzle.config';
+import { UserTable } from '../libs/db/schema';
+import { errorHandler } from '../libs/middleware/errorHandler';
 
 dotenv.config();
 

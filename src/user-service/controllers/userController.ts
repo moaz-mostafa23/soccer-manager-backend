@@ -1,52 +1,46 @@
-import { UserTable } from '../db/schema';
 import bcrypt from 'bcryptjs';
-import db from '../config/drizzle.config';
-import { eq } from 'drizzle-orm';
-import { UnprocessableEntity, BadRequest } from 'http-errors';
-import { UserInput, RegisteredUser, User } from '../libs/interfaces';
+import { BadRequest, UnprocessableEntity } from 'http-errors';
+import { UserInput, RegisteredUser, User } from '../../libs/interfaces';
 import { generateToken } from '../utils';
+import UserRepository from '../../libs/repositories/UserRepository';
 
 export const registerUser = async (input: UserInput): Promise<RegisteredUser> => {
-
-    const { email, password } = input
+    const { email, password } = input;
 
     if (!email || !password) {
         throw new BadRequest('Please provide email and password');
     }
 
-    const userEmail = email.trim()
-    const userPassword = password.trim()
+    const userEmail = email.trim();
+    const userPassword = password.trim();
+
 
     await checkUserExistence(userEmail);
 
+
     const hashedPassword = await bcrypt.hash(userPassword, 10);
 
-    const insertedUsers: User[] = await db
-        .insert(UserTable)
-        .values({
-            email: userEmail,
-            password: hashedPassword,
-        })
-        .returning()
 
-    const user = insertedUsers[0];
+    const newUser = await UserRepository.create({
+        email: userEmail,
+        password: hashedPassword,
+    });
+
+    const token = generateToken(newUser.id);
 
     return {
-        ...user,
-        token: generateToken(user.id),
-    }
+        ...newUser,
+        token,
+    };
 };
 
 export const checkUserExistence = async (email: string) => {
-    const existingUser = await db
-        .select()
-        .from(UserTable)
-        .where(eq(UserTable.email, email));
+    const userExists = await UserRepository.userExists(email);
 
-    if (existingUser.length > 0) {
+    if (userExists) {
         throw new UnprocessableEntity('User already exists');
     }
-}
+};
 
 export const loginUser = async (input: UserInput) => {
     const { email, password } = input;
@@ -55,26 +49,22 @@ export const loginUser = async (input: UserInput) => {
         throw new BadRequest('Please provide email and password');
     }
 
-    const userEmail = email.trim()
-    const userPassword = password.trim()
+    const userEmail = email.trim();
+    const userPassword = password.trim();
 
-    const users: User[] = await db
-        .select()
-        .from(UserTable)
-        .where(eq(UserTable.email, userEmail))
+    const user = await UserRepository.findByEmail(userEmail);
 
-    const user = users[0];
-
-    if (user) {
-        const isMatch = await bcrypt.compare(userPassword, user.password);
-
-        if (isMatch) {
-            return {
-                email: user.email,
-                token: generateToken(user.id),
-            };
-        }
+    if (!user) {
+        throw new BadRequest('Invalid credentials');
     }
 
-    throw new BadRequest('Invalid credentials');
+    const isMatch = await bcrypt.compare(userPassword, user.password);
+    if (!isMatch) {
+        throw new BadRequest('Invalid credentials');
+    }
+
+    return {
+        email: user.email,
+        token: generateToken(user.id),
+    };
 };
