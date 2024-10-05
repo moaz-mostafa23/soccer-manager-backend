@@ -1,6 +1,6 @@
 import express, { Application } from 'express';
 import dotenv from 'dotenv';
-import userRoutes from './routes/userRoutes';
+import userRoutes from './userRoutes';
 import db from '../libs/config/drizzle.config';
 import { UserTable } from '../libs/db/schema';
 import { errorHandler } from '../libs/middleware/errorHandler';
