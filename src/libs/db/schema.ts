@@ -1,3 +1,4 @@
+import { InferSelectModel } from "drizzle-orm";
 import { serial, text, boolean, pgTable } from "drizzle-orm/pg-core";
 
 export const UserTable = pgTable('users', {
@@ -6,3 +7,5 @@ export const UserTable = pgTable('users', {
     password: text('password').notNull(),
     isVerified: boolean('is_verified').notNull().default(false),
 });
+
+export type User = InferSelectModel<typeof UserTable>;

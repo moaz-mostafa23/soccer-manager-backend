@@ -1,57 +1,69 @@
-import { eq, and, SQL } from 'drizzle-orm';
-import { PgTable } from 'drizzle-orm/pg-core';
-import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import * as schema from '../db/schema';
+import { PgUpdateSetSource, type PgTable } from "drizzle-orm/pg-core";
+import { eq, InferInsertModel, sql } from "drizzle-orm";
+import { DrizzleRepository, QueryCriteria } from "./DrizzleRepository";
+import db from "../config/drizzle.config";
 
+export abstract class BaseRepository<M extends PgTable, ID extends keyof M["$inferSelect"], U> implements DrizzleRepository<M, ID, U> {
 
-class BaseRepository<T extends PgTable, K> {
-    private table: T;
-    private db: NodePgDatabase<typeof schema>;
+    protected constructor(
+        protected readonly drizzleDb: typeof db,
+        protected readonly schema: M,
+        protected readonly primaryKey: ID
+    ) { }
 
-    constructor(table: T, db: NodePgDatabase<typeof schema>) {
-        this.table = table;
-        this.db = db;
-    }
-
-    async create(values: T["$inferInsert"]): Promise<K> {
-        const insertedRecords = await this.db
-            .insert(this.table)
-            .values(values)
+    async create(data: InferInsertModel<M>): Promise<U> {
+        const result = await this.drizzleDb
+            .insert(this.schema)
+            .values({ ...data })
             .returning();
-        return insertedRecords[0] as K;
+
+        return result[0] as U;
     }
 
-    async find(whereClause: Partial<K>): Promise<K[]> {
-        const conditions: SQL<unknown>[] = Object.keys(whereClause).map(key => eq(this.table[key], whereClause[key]));
+    async findAll(): Promise<U[]> {
+        const result = await this.drizzleDb.select().from(this.schema);
+        return result as U[];
+    }
 
-        const result = await this.db
+    async list(
+        where?: Partial<U>,
+        limit?: number,
+        page?: number
+    ): Promise<U[]> {
+        let query: any = this.drizzleDb.select().from(this.schema);
+
+        if (where) {
+            for (const [key, value] of Object.entries(where)) {
+                query = query.where(eq((this.schema as any)[key], value as any));
+            }
+        }
+
+        if (limit !== undefined && page !== undefined) {
+            const offset = (page - 1) * limit;
+            query = query.limit(limit).offset(offset);
+        }
+
+        const result = await query;
+        return result as U[];
+    }
+
+
+    async findById(id: M["$inferSelect"][ID]): Promise<U | null> {
+        const result = await this.drizzleDb
             .select()
-            .from(this.table)
-            .where(conditions.length > 1 ? and(...conditions) : conditions[0]);
+            .from(this.schema)
+            .where(eq(sql`${this.primaryKey}`, id));
 
-        return result as K[];
+        return result.length > 0 ? result[0] as U : null;
     }
 
-    async findById(id: number): Promise<K | null> {
-        const result = await this.db
-            .select()
-            .from(this.table)
-            .where(eq(this.table['id'], id));
-        return result[0] as K || null;
+    async update(id: M["$inferSelect"][ID], data: PgUpdateSetSource<M>): Promise<U> {
+        await this.findById(id);
+        await this.drizzleDb.update(this.schema).set(data).where(eq(sql`${this.primaryKey}`, id));
+        return this.findById(id) as Promise<U>;
     }
 
-    async update(id: number, values: Partial<K>): Promise<void> {
-        await this.db
-            .update(this.table)
-            .set(values)
-            .where(eq(this.table['id'], id));
-    }
-
-    async delete(id: number): Promise<void> {
-        await this.db
-            .delete(this.table)
-            .where(eq(this.table['id'], id));
+    async delete(id: M["$inferSelect"][ID]): Promise<void> {
+        await this.drizzleDb.delete(this.schema).where(eq(sql`${this.primaryKey}`, id));
     }
 }
-
-export default BaseRepository;

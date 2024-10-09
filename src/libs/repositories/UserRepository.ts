@@ -1,22 +1,22 @@
-import { UserTable } from '../db/schema';
+import { User, UserTable } from '../db/schema';
 import db from '../config/drizzle.config';
-import BaseRepository from './BaseRepositories';
-import { User } from '../interfaces';
+import { eq } from 'drizzle-orm';
+import { BaseRepository } from './BaseRepositories';
 
-
-class UserRepository extends BaseRepository<typeof UserTable, User> {
+class UserRepository extends BaseRepository<typeof UserTable, "id", User> {
     constructor() {
-        super(UserTable, db);
+        super(db, UserTable, 'id');
     }
 
     async findByEmail(email: string): Promise<User | null> {
-        const users = await this.find({ email });
-        return users[0] || null;
+        const users = await this.list({ email }, 1, 1);
+        return users.length > 0 ? users[0] : null;
     }
 
     async userExists(email: string): Promise<boolean> {
-        const users = await this.find({ email });
-        return users.length > 0;
+        const user = await this.list({ email }, 1, 1);
+        console.log('user', user);
+        return user.length > 0;
     }
 }
 
