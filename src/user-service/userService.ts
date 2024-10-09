@@ -1,8 +1,8 @@
 import bcrypt from 'bcryptjs';
 import { BadRequest, UnprocessableEntity } from 'http-errors';
-import { UserInput, RegisteredUser, User } from '../libs/interfaces';
+import { UserInput, RegisteredUser } from '../libs/interfaces';
 import { generateToken } from './utils';
-import UserRepository from '../libs/repositories/UserRepository';
+import UserRepository from './UserRepository';
 
 class UserService {
     constructor(private userRepository = UserRepository) { }

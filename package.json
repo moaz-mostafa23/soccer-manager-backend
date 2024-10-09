@@ -5,9 +5,9 @@
   "main": "dist/user-service/app.js",
   "type": "commonjs",
   "scripts": {
-    "build": "tsc",
+    "compile": "tsc",
     "start": "node dist/user-service/app.js",
-    "dev": "nodemon --watch src --ext ts,js,json --exec 'npm run build && node dist/user-service/app.js'"
+    "dev": "nodemon --watch src --ext ts,js,json --exec 'npm run compile && node dist/user-service/app.js'"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
