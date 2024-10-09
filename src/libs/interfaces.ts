@@ -9,10 +9,12 @@ export interface RegisteredUser extends User {
     token: string;
 }
 
-export interface IRepository<T, K> {
-    create(values: Partial<T>): Promise<K>;
-    find(whereClause: Partial<K>): Promise<K[]>;
-    findById(id: number): Promise<K | null>;
-    update(id: number, values: Partial<K>): Promise<void>;
-    delete(id: number): Promise<void>;
+
+export interface QueryCriteria {
+    limit?: number;
+    offset?: number;
+}
+
+export interface Entity<ID> {
+    id: ID;
 }
