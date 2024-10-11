@@ -1,12 +1,8 @@
 import nodemailer from 'nodemailer';
-import UserRepository from './UserRepository';
-import { BadRequest } from 'http-errors';
+import UserRepository from './userRepository';
 
 
 class EmailService {
-    constructor(
-        private userRepository = UserRepository
-    ) { }
 
     async sendVerificationEmail(email: string, token: string) {
         const transporter = nodemailer.createTransport({
