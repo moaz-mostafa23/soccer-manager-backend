@@ -5,7 +5,8 @@ export const UserTable = pgTable('users', {
     id: uuid('id').primaryKey().defaultRandom(),
     email: text('email').notNull().unique(),
     password: text('password').notNull(),
-    isVerified: boolean('is_verified').notNull().default(false),
+    is_verified: boolean('is_verified').notNull().default(false),
+    verification_token: text('verification_token'),
 });
 
 export type User = InferSelectModel<typeof UserTable>;

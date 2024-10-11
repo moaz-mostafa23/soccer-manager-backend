@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import userRoutes from './userRoutes';
 import db from '../libs/config/drizzle.config';
 import { UserTable } from '../libs/db/schema';
-import { errorHandler } from '../libs/middleware/errorHandler';
+import { errorHandler } from '../libs/common/middleware/errorHandler';
 
 dotenv.config();
 

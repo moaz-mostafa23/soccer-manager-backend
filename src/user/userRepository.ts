@@ -1,8 +1,9 @@
 import { User, UserTable } from '../libs/db/schema';
 import db from '../libs/config/drizzle.config';
 import { DrizzleRepository } from '../libs/repositories/DrizzleRepository';
+import { IUserRepository } from './interfaces';
 
-class UserRepository extends DrizzleRepository<typeof UserTable, User> {
+class UserRepository extends DrizzleRepository<typeof UserTable, User> implements IUserRepository {
     constructor() {
         super(db, UserTable, 'id');
     }

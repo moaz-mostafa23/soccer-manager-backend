@@ -2,7 +2,11 @@ import { BaseRepository } from './BaseRepository';
 import { eq, SQL, sql } from 'drizzle-orm';
 import db from '../config/drizzle.config';
 import { PgTable, PgUpdateSetSource } from 'drizzle-orm/pg-core';
-import { Entity, QueryCriteria } from '../interfaces';
+import { QueryCriteria } from '../common/interfaces';
+
+export interface Entity<ID> {
+    id: ID;
+}
 
 export abstract class DrizzleRepository<M extends PgTable, U extends Entity<string>>
     implements BaseRepository<U> {
@@ -36,14 +40,22 @@ export abstract class DrizzleRepository<M extends PgTable, U extends Entity<stri
         const result = await this.drizzleDb
             .select()
             .from(this.schema)
-            .where(eq(sql`${this.primaryKey}`, id));
+            .where(eq((this.schema as any)[this.primaryKey], id));
         return result.length > 0 ? result[0] as U : null;
     }
 
+
     async update(id: string, data: PgUpdateSetSource<M>): Promise<U> {
-        await this.findById(id);
-        await this.drizzleDb.update(this.schema).set(data).where(eq(sql`${this.primaryKey}`, id));
-        return this.findById(id) as Promise<U>;
+        const record = await this.findById(id);
+
+        await this.drizzleDb
+            .update(this.schema)
+            .set(data)
+            .where(eq((this.schema as any)[this.primaryKey], id));
+
+        const updatedRecord = await this.findById(id);
+
+        return updatedRecord as unknown as Promise<U>;
     }
 
     async delete(id: string): Promise<void> {

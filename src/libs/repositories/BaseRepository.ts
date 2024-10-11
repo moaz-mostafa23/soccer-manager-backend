@@ -1,4 +1,4 @@
-import { QueryCriteria } from "../interfaces";
+import { QueryCriteria } from "../common/interfaces";
 
 export interface BaseRepository<T> {
     findAll(criteria?: QueryCriteria): Promise<T[]>;

@@ -18,3 +18,12 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         next(error);
     }
 };
+
+export const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        await UserService.verifyEmail(req.body.token as string);
+        res.json({ message: 'Email verified successfully' });
+    } catch (error) {
+        next(error);
+    }
+}
