@@ -13,7 +13,7 @@ class EmailService {
             },
         });
 
-        const verificationUrl = `123/verify-email?token=${token}`;
+        const verificationUrl = `${process.env.DASHBOARD_URL}/verify-email?token=${token}`;
         await transporter.sendMail({
             from: '"Fantasy Football App" <no-reply@fantasyapp.com>',
             to: email,
