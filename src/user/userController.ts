@@ -25,7 +25,7 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
         await UserService.verifyEmail(req.body.token as string);
         res.json({ message: 'Email verified successfully' });
     } catch (error: any) {
-        next(error); // Ensure error is passed properly to middleware
+        next(error);
     }
 };
 
