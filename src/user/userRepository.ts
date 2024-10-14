@@ -12,11 +12,6 @@ class UserRepository extends DrizzleRepository<typeof UserTable, User> implement
         const users = await this.list({ email }, { limit: 1 });
         return users.length > 0 ? users[0] : null;
     }
-
-    async userExists(email: string): Promise<boolean> {
-        const user = await this.list({ email }, { limit: 1 });
-        return user.length > 0;
-    }
 }
 
 export default new UserRepository();

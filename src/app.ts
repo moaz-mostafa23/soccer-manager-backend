@@ -1,8 +1,8 @@
 import express, { Application } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import userRoutes from './userRoutes';
-import { errorHandler } from '../libs/common/middleware/errorHandler';
+import userRoutes from './user/userRoutes';
+import { errorHandler } from './libs/common/middleware/errorHandler';
 
 dotenv.config();
 
