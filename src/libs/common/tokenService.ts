@@ -3,17 +3,13 @@ import * as jwt from 'jsonwebtoken';
 
 class TokenService {
     generateToken(): string {
-        return crypto.randomBytes(32).toString('hex'); //TODO: make it expire aftre some time
+        return crypto.randomBytes(32).toString('hex');
     }
 
     generateJwtToken(id: string) {
-        jwt.sign({ user: { id } }, process.env.JWT_SECRET!, {
-            expiresIn: '60d',
+        return jwt.sign({ user: { id } }, process.env.JWT_SECRET!, {
+            expiresIn: '1h',
         });
-    }
-
-    verifyToken(token: string): boolean {
-        return !!token; //TODO: Implement token verification
     }
 }
 

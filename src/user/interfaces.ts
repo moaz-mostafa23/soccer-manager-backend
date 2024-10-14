@@ -8,5 +8,4 @@ export interface UserInput {
 
 export interface IUserRepository extends BaseRepository<User> {
     findByEmail(email: string): Promise<User | null>;
-    userExists(email: string): Promise<boolean>;
 }

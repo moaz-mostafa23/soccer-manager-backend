@@ -1,10 +1,11 @@
 import bcrypt from 'bcryptjs';
-import { BadRequest, UnprocessableEntity, Unauthorized } from 'http-errors';
+import { BadRequest, Conflict, Unauthorized } from 'http-errors';
 import { UserInput } from './interfaces';
 import { User } from '../libs/db/schema';
 import UserRepository from './userRepository';
 import TokenService from '../libs/common/tokenService';
 import EmailService from './emailService';
+import crypto from 'crypto';
 
 class UserService {
     constructor(
@@ -13,64 +14,69 @@ class UserService {
         private emailService = EmailService,
     ) { }
 
-    async registerUser(input: UserInput): Promise<User> {
+    async registerUser(input: UserInput) {
         const { email, password } = input;
 
-        if (!email || !password) {
-            throw new BadRequest('Please provide email and password');
-        }
-
         const userEmail = email.trim();
-        const userPassword = password.trim();
 
         await this.checkUserExistence(userEmail);
 
-        const hashedPassword = await bcrypt.hash(userPassword, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-        const verificationToken = this.tokenService.generateToken();
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+        const verificationTokenExpires = new Date(Date.now() + 60 * 60 * 1000); // 1h
 
         const newUser = await this.userRepository.create({
             email: userEmail,
             password: hashedPassword,
             verification_token: verificationToken,
+            verification_token_expires: verificationTokenExpires,
         });
 
         await this.emailService.sendVerificationEmail(userEmail, verificationToken);
 
-        return newUser;
+        return {
+            user: newUser,
+            token: this.tokenService.generateJwtToken(newUser.id),
+        };
     }
 
     async verifyEmail(token: string) {
         const users = await this.userRepository.list({ verification_token: token });
 
-        console.log(users, 'users');
-
         if (!users.length) {
-            throw new BadRequest('Invalid or expired token');
+            throw new BadRequest('Invalid token');
         }
 
         const user = users[0];
 
-        await this.userRepository.update(user.id, { is_verified: true, verification_token: null });
+        if (user.verification_token_expires && user.verification_token_expires < new Date()) {
+            throw new BadRequest('Token has expired');
+        }
+
+        await this.userRepository.update(user.id, {
+            is_verified: true,
+            verification_token: null,
+            verification_token_expires: null,
+        });
+
+
+        return { user, token: this.tokenService.generateJwtToken(user.id) };
     }
 
     async checkUserExistence(email: string) {
-        const userExists = await this.userRepository.userExists(email);
+        const user = await this.userRepository.findByEmail(email.trim());
 
-        if (userExists) {
-            throw new UnprocessableEntity('User already exists');
+        if (user) {
+            throw new Conflict('User already exists');
         }
     }
 
     async loginUser(input: UserInput) {
         const { email, password } = input;
 
-        if (!email || !password) {
-            throw new Unauthorized('Please provide email and password');
-        }
-
         const user = await this.userRepository.findByEmail(email.trim());
-        if (!user || !(await bcrypt.compare(password.trim(), user.password))) {
+        if (!user || !(await bcrypt.compare(password, user.password))) {
             throw new Unauthorized('Invalid credentials');
         }
 
@@ -79,7 +85,7 @@ class UserService {
         }
 
         return {
-            email: user.email,
+            user: user,
             token: this.tokenService.generateJwtToken(user.id),
         };
     }
