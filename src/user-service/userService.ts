@@ -1,7 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { BadRequest, Conflict, Unauthorized } from 'http-errors';
 import { UserInput } from './interfaces';
-import { User } from '../libs/db/schema';
 import UserRepository from './userRepository';
 import TokenService from '../libs/common/tokenService';
 import EmailService from './emailService';

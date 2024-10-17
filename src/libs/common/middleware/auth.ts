@@ -5,11 +5,12 @@ interface AuthenticatedRequest extends Request {
     user?: string | jwt.JwtPayload;
 }
 
-export const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     const token = req.header('Authorization');
 
     if (!token) {
-        return res.status(401).json({ message: 'No token, no bueno senor' });
+        res.status(401).json({ message: 'No token, no bueno senor' });
+        return;
     }
 
     try {
@@ -17,6 +18,7 @@ export const authMiddleware = (req: AuthenticatedRequest, res: Response, next: N
         req.user = decoded;
         next();
     } catch (err) {
-        return res.status(401).json({ message: 'token is shit, try again' });
+        res.status(401).json({ message: 'token is shit, try again' });
+        return;
     }
 };

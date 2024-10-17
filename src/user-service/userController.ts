@@ -34,6 +34,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
 export const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        // TODO: Add validation for token
         await UserService.verifyEmail(req.body.token as string);
         res.json({ message: 'Email verified successfully' });
     } catch (error: any) {
