@@ -79,10 +79,6 @@ class UserService {
             throw new Unauthorized('Invalid credentials');
         }
 
-        if (!user.is_verified) {
-            throw new Unauthorized('Please verify your email before logging in');
-        }
-
         return {
             user: user,
             token: this.tokenService.generateJwtToken(user.id),

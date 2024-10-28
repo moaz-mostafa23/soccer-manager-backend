@@ -44,3 +44,16 @@ export const PlayerTable = pgTable('players', {
 
 export type Player = InferSelectModel<typeof PlayerTable>;
 
+// TRANSFER LIST TABLE
+export const TransferListingTable = pgTable('transfer_listings', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    player_id: uuid('player_id').notNull().references(() => PlayerTable.id, {
+        onDelete: 'cascade',
+    }),
+    team_id: uuid('team_id').notNull().references(() => TeamTable.id),
+    asking_price: numeric('asking_price').notNull(),
+    is_active: boolean('is_active').notNull().default(true),
+    listed_date: timestamp('listed_date').defaultNow(),
+});
+
+export type TransferListing = InferSelectModel<typeof TransferListingTable>;

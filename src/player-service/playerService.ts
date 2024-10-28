@@ -43,23 +43,10 @@ class PlayerService {
         return await this.playerRepository.getPlayersByTeamId(teamId);
     }
 
-    async placePlayerOnTransferList(playerId: string, askingPrice: string) {
+
+    async transferPlayer(playerId: string, newTeamId: string, newMarketValue: number) {
         const player = await this.playerRepository.findById(playerId);
         if (!player) throw new NotFound('Player not found');
-
-        await this.playerRepository.update(playerId, { market_value: askingPrice }); //only players with a market value can be placed on the transfer list
-
-        return player;
-    }
-
-    async transferPlayer(playerId: string, newTeamId: string, askingPrice: string) {
-        const player = await this.playerRepository.findById(playerId);
-        if (!player) throw new NotFound('Player not found');
-
-
-        const randomIncreaseFactor = 1 + Math.random() * (1 - 0.1);
-        const newMarketValue = (parseFloat(askingPrice) * randomIncreaseFactor).toFixed(2);
-
 
         await this.playerRepository.transferPlayer(playerId, newTeamId, newMarketValue);
 

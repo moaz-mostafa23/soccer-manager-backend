@@ -13,15 +13,14 @@ class PlayerRepository extends DrizzleRepository<typeof PlayerTable, Player> imp
         return players;
     }
 
-    async transferPlayer(playerId: string, newTeamId: string, newMarketValue: string) {
-        await this.update(playerId, { team_id: newTeamId, market_value: newMarketValue });
+    async transferPlayer(playerId: string, newTeamId: string, newMarketValue: number) {
+        await this.update(playerId, { team_id: newTeamId, market_value: String(newMarketValue) });
     }
 
     async batchCreatePlayers(playersData: Player[]): Promise<Player[]> {
         const insertedPlayers = await db.insert(PlayerTable)
             .values(playersData)
             .returning();
-
         return insertedPlayers;
     }
 }

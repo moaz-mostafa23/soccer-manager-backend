@@ -1,4 +1,4 @@
-import { Player, Team, User } from "../db/schema";
+import { Player, Team, User, TransferListing } from "../db/schema";
 import { BaseRepository } from "../repositories/BaseRepository";
 
 export interface QueryCriteria {
@@ -15,8 +15,12 @@ export interface ITeamRepository extends BaseRepository<Team> {
 
 export interface IPlayerRepository extends BaseRepository<Player> {
     getPlayersByTeamId(teamId: string): Promise<Player[] | null>;
-    transferPlayer(playerId: string, newTeamId: string, newMarketValue: string): Promise<void>;
+    transferPlayer(playerId: string, newTeamId: string, newMarketValue: number): Promise<void>;
     batchCreatePlayers(playersData: any[]): Promise<Player[]>;
+}
+
+export interface ITransferRepository extends BaseRepository<TransferListing> {
+    // findByUserId(userId: string): Promise<TransferListing | null>;
 }
 
 

@@ -4,7 +4,7 @@ import { getRandomCountry } from './utils';
 import PlayerService from '../player-service/playerService';
 import { sumBy } from 'lodash';
 
-export class TeamService {
+class TeamService {
     constructor(
         private teamRepository = TeamRepository,
     ) { }
@@ -38,4 +38,18 @@ export class TeamService {
         const players = await PlayerService.getPlayersByTeam(team.id);
         return { team, players };
     }
+
+    async updateBudget(teamId: string, amount: number) {
+        const team = await this.teamRepository.findById(teamId);
+
+        if (!team) {
+            throw new NotFound('Team not found');
+        }
+
+        const newBudget = Number(team.additional_budget) + amount;
+
+        await this.teamRepository.update(teamId, { additional_budget: String(newBudget) })
+    }
 }
+
+export default new TeamService()
