@@ -2,12 +2,12 @@
   "name": "soccer-manager-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/user-service/app.js",
+  "main": "dist/app.js",
   "type": "commonjs",
   "scripts": {
     "compile": "tsc",
-    "start": "node dist/user-service/app.js",
-    "dev": "nodemon --watch src --ext ts,js,json --exec 'npm run compile && node dist/user-service/app.js'",
+    "start": "node dist/app.js",
+    "dev": "nodemon --watch src --ext ts,js,json --exec 'npm run compile && node dist/app.js'",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watchAll"
   },
