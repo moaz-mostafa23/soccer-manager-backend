@@ -9,7 +9,8 @@
     "start": "node dist/app.js",
     "dev": "nodemon --watch src --ext ts,js,json --exec 'npm run compile && node dist/app.js'",
     "test": "jest --passWithNoTests",
-    "test:watch": "jest --watchAll"
+    "test:watch": "jest --watchAll",
+    "drizzle:migrate": "NODE_TLS_REJECT_UNAUTHORIZED=0 drizzle-kit push"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
