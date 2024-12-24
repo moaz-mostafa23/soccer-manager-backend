@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const pool = new Pool({
-    connectionString: `${process.env.DATABASE_URL}?sslmode=no-verify`,
+    connectionString: `${process.env.DATABASE_URL}?sslmode=require`,
 });
 
 const db = drizzle(pool, { schema });
