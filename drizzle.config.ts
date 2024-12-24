@@ -6,7 +6,7 @@ export default defineConfig({
     dialect: 'postgresql',
     dbCredentials: {
         url: `${process.env.DATABASE_URL!}?sslmode=require`,
-        ssl: { rejectUnauthorized: false },
+        ssl: true,
     },
     tablesFilter: ['players', 'teams', 'transfer_listings', 'users'],
     verbose: true,
