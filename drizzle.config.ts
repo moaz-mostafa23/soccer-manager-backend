@@ -5,7 +5,7 @@ export default defineConfig({
     out: './drizzle',
     dialect: 'postgresql',
     dbCredentials: {
-        url: process.env.MY_DATABASE_URL!,
+        url: `${process.env.DATABASE_URL!}?sslmode=no-verify`,
         ssl: { rejectUnauthorized: false },
     },
     tablesFilter: ['players', 'teams', 'transfer_listings', 'users'],
