@@ -47,7 +47,7 @@ app.use((req, res, next) => {
 });
 
 
-const PORT = process.env.USER_SERVICE_PORT || 5001;
+const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
     console.log(`App running on port ${PORT}`);
