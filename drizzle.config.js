@@ -12,5 +12,5 @@ export default defineConfig({
   },
   verbose: true,
   strict: true,
-  tablesFilter: ['pg_stat_statements', 'pg_stat_statements_info']
+  tablesFilter: ['players', 'teams', 'transfer_listings', 'users'],
 });
