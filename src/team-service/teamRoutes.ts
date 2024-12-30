@@ -6,6 +6,6 @@ const router = Router();
 
 router.use(authMiddleware);
 
-// router.post('/generate', generateTeam);
+router.post('/generate', generateTeam);
 
 export default router;
