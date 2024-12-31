@@ -7,7 +7,10 @@ interface AuthenticatedRequest extends Request {
 
 export const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     console.log("🚀 ~ authMiddleware ~ req:", req)
-    const token = req.header('Authorization');
+    // const token = req.header('Authorization');
+    const token = req.header('Authorization')?.split(' ')[1];
+    console.log("🚀 ~ authMiddleware ~ token (raw):", token);
+
     console.log("🚀 ~ authMiddleware ~ token:", token)
 
     if (!token) {
